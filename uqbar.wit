@@ -140,7 +140,7 @@ interface standard {
     // saves capabilities to our store, so we can use them
     save-capabilities: func(capabilities: list<signed-capability>);
 
-    // check to see if the sender of a prompting message has a given capability, issued by us
+    // check to see if the sender of a prompting message has a given capability, issued by process
     // if the prompting message has a remote source, they must have attached it.
     has-capability: func(process: process-id, params: json) -> bool;
 
