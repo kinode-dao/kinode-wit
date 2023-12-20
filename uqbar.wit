@@ -1,4 +1,4 @@
-package uqbar:process@0.5.0;
+package uqbar:process@0.6.0;
 
 interface standard {
     // JSON is passed over WASM boundary as a string.
@@ -142,11 +142,11 @@ interface standard {
 
     // check to see if the sender of a prompting message has a given capability, issued by us
     // if the prompting message has a remote source, they must have attached it.
-    has-capability: func(params: json) -> bool;
+    has-capability: func(process: process-id, params: json) -> bool;
 
     // generates a new capability with our process as the issuer and gives it to the target,
     // which must be a locally-running process.
-    create-capability: func(to: process-id, params: json);
+    create-capability: func(params: json) -> signed-capability;
 
     // take a signed capability and save it to a given locally-running process
     share-capability: func(to: process-id, capability: signed-capability);
