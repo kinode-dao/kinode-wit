@@ -122,6 +122,8 @@ interface standard {
                 name: option<string>,
                 wasm-path: string, // must be located within package's drive
                 on-exit: on-exit,
+                can-network: bool,
+                messaging: capabilities,
                 capabilities: capabilities,
                 public: bool
             ) -> result<process-id, spawn-error>;
