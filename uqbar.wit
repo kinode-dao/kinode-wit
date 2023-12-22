@@ -137,8 +137,11 @@ interface standard {
     // gets all capabilities attached to the last message we received
     get-capabilities: func() -> list<signed-capability>;
 
-    // verify that a signed-capability was signed by the given process
-    verify-capability: func(process: process-id, capability: signed-capability) -> bool;
+    // shares the capability to message `from` to `to`
+    grant-messaging: func(from: process-id, to: process-id) -> bool; // TODO maybe return a result
+
+    // grants the ability of `to` to send networked messages
+    grant-networking: func(to: process-id) -> bool; // TODO maybe return a result?
 
     // message I/O:
 
