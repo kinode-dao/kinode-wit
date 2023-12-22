@@ -128,29 +128,17 @@ interface standard {
 
     // capabilities management
 
-    // gives us all our signed capabilities so we can send them to others
-    get-capabilities: func() -> list<signed-capability>;
-
-    // gets a single specific capability
-    get-capability: func(issuer: address, params: json) -> option<signed-capability>;
-
-    // attaches a specific signed capability to our next message
-    attach-capability: func(capability: signed-capability);
-
-    // saves capabilities to our store, so we can use them
-    save-capabilities: func(capabilities: list<signed-capability>);
-
-    // check to see if the sender of a prompting message has a given capability, issued by process
-    // if the prompting message has a remote source, they must have attached it.
-    has-capability: func(process: process-id, params: json) -> bool;
-
-    // generates a new capability with our process as the issuer and gives it to the target,
-    // which must be a locally-running process.
+    // generates a new capability with our process as the issuer and signs it
     create-capability: func(params: json) -> signed-capability;
 
-    // take a signed capability and save it to a given locally-running process
-    share-capability: func(to: process-id, capability: signed-capability);
+    // attaches a list of signed capabilities to our next message
+    attach-capabilities: func(capabilities: list<signed-capability>);
 
+    // gets all capabilities attached to the last message we received
+    get-capabilities: func() -> list<signed-capability>;
+
+    // verify that a signed-capability was signed by the given process
+    verify-capability: func(process: process-id, capability: signed-capability) -> bool;
 
     // message I/O:
 
