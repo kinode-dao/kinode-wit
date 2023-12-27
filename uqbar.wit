@@ -134,10 +134,10 @@ interface standard {
 
     // gets all capabilities attached to the last message we received
     // doesn't impact persisted state
-    get-capabilities: func() -> set<capability>;
+    get-capabilities: func() -> list<capability>; // TODO should be a set but I don't think wit has sets
 
     // saves the capabilities to persisted process state
-    save-capabilities: func(caps: list<capability>) -> reuslt<string>;
+    save-capabilities: func(caps: list<capability>) -> result<string>;
 
     // message I/O:
 
