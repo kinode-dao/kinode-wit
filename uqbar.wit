@@ -121,8 +121,6 @@ interface standard {
                 name: option<string>,
                 wasm-path: string, // must be located within package's drive
                 on-exit: on-exit,
-                can-network: bool,
-                messaging: capabilities,
                 capabilities: capabilities,
                 public: bool
             ) -> result<process-id, spawn-error>;
@@ -134,10 +132,10 @@ interface standard {
 
     // gets all capabilities attached to the last message we received
     // doesn't impact persisted state
-    get-capabilities: func() -> list<capability>; // TODO should be a set but I don't think wit has sets
+    get-capabilities: func() -> list<capability>;
 
     // saves the capabilities to persisted process state
-    save-capabilities: func(caps: list<capability>) -> result<string>;
+    save-capabilities: func(caps: list<capability>); // TODO result<string, string> ?
 
     // message I/O:
 
