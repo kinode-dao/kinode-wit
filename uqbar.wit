@@ -137,6 +137,9 @@ interface standard {
     // saves the capabilities to persisted process state
     save-capabilities: func(caps: list<capability>); // TODO result<string, string> ?
 
+    // gets all capabilities from persisted process state
+    our-capabilities: func() -> list<capability>;
+
     // message I/O:
 
     // ingest next message when it arrives along with its source.
