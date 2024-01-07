@@ -36,16 +36,16 @@ interface standard {
         expects-response: option<u64>,
         ipc: list<u8>,
         metadata: option<json>,
-        // to grab payload, use get_payload()
         capabilities: list<capability>,
+        // to grab payload, use get_payload()
     }
 
     record response {
         inherit: bool,
         ipc: list<u8>,
         metadata: option<json>,
+        capabilities: list<capability>,
         // to grab payload, use get_payload()
-        capabilities: list<capability>
     }
 
     // a message can be a request or a response.
@@ -126,14 +126,10 @@ interface standard {
     // capabilities management
 
     // saves the capabilities to persisted process state
-    save-capabilities: func(caps: list<capability>); // TODO result<string, string> ?
+    save-capabilities: func(caps: list<capability>);
 
     // gets all capabilities from persisted process state
     our-capabilities: func() -> list<capability>;
-
-    // grants a capability to another process
-    // only available to processes with the "root" capability
-    grant-capabilities: func(target: process-id, capabilities: list<capability>);
 
     // message I/O:
 
