@@ -27,13 +27,13 @@ interface standard {
         process: process-id,
     }
 
-    record lazy_load_blob {
+    record lazy-load-blob {
         mime: option<string>,
         bytes: list<u8>,
     }
 
     record request {
-        // set in order to inherit lazy_load_blob from parent message, and if
+        // set in order to inherit lazy-load-blob from parent message, and if
         // expects-response is none, direct response to source of parent.
         // also carries forward certain aspects of parent message in kernel,
         // see documentation for formal spec and examples.
@@ -43,7 +43,7 @@ interface standard {
         body: list<u8>,
         metadata: option<json>,
         capabilities: list<capability>,
-        // to grab lazy_load_blob, use get_blob()
+        // to grab lazy-load-blob, use get_blob()
     }
 
     record response {
@@ -51,7 +51,7 @@ interface standard {
         body: list<u8>,
         metadata: option<json>,
         capabilities: list<capability>,
-        // to grab lazy_load_blob, use get_blob()
+        // to grab lazy-load-blob, use get_blob()
     }
 
     // A message can be a request or a response. within a response, there is
@@ -74,21 +74,21 @@ interface standard {
     variant on-exit {
         none,
         restart,
-        requests(list<tuple<address, request, option<lazy_load_blob>>>),
+        requests(list<tuple<address, request, option<lazy-load-blob>>>),
     }
 
     // Network errors come from trying to send a message to another node.
     // A message can fail by timing out, or by the node being entirely
     // unreachable (offline). In either case, the message is not delivered
     // and the process that sent it receives that message along with any
-    // assigned context and/or lazy_load_blob, and is free to handle it as it
+    // assigned context and/or lazy-load-blob, and is free to handle it as it
     // sees fit. Note that if the message is a response, the process can
     // issue a response again, and it will be directed to the same (remote)
     // request as the original.
     record send-error {
         kind: send-error-kind,
         message: message,
-        lazy_load_blob: option<lazy_load_blob>,
+        lazy-load-blob: option<lazy-load-blob>,
     }
 
     enum send-error-kind {
@@ -152,27 +152,27 @@ interface standard {
     receive: func() ->
         result<tuple<address, message>, tuple<send-error, option<context>>>;
 
-    // Gets lazy_load_blob, if any, of the message we most recently received.
-    get-blob: func() -> option<lazy_load_blob>;
+    // Gets lazy-load-blob, if any, of the message we most recently received.
+    get-blob: func() -> option<lazy-load-blob>;
 
     // Send message(s) to target(s).
     send-request: func(
         target: address,
         request: request,
         context: option<context>,
-        lazy_load_blob: option<lazy_load_blob>
+        lazy-load-blob: option<lazy-load-blob>
     );
 
     send-requests: func(
         requests: list<tuple<address,
                              request,
                              option<context>,
-                             option<lazy_load_blob>>>
+                             option<lazy-load-blob>>>
     );
 
     send-response: func(
         response: response,
-        lazy_load_blob: option<lazy_load_blob>
+        lazy-load-blob: option<lazy-load-blob>
     );
 
     // Send a single request, then block (internally) until its response. The
@@ -180,7 +180,7 @@ interface standard {
     send-and-await-response: func(
         target: address,
         request: request,
-        lazy_load_blob: option<lazy_load_blob>
+        lazy-load-blob: option<lazy-load-blob>
     ) -> result<tuple<address, message>, send-error>;
 }
 
