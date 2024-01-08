@@ -132,7 +132,7 @@ interface standard {
     ) -> result<process-id, spawn-error>;
 
     //
-    // capabilities management:
+    // Capabilities management:
     //
 
     // Saves the capabilities to persisted process state.
@@ -142,7 +142,7 @@ interface standard {
     our-capabilities: func() -> list<capability>;
 
     //
-    // message I/O:
+    // Message I/O:
     //
 
     // Ingest next message when it arrives along with its source.
@@ -153,7 +153,7 @@ interface standard {
     // Gets lazy_load_blob, if any, of the message we most recently received.
     get-blob: func() -> option<lazy_load_blob>;
 
-    // send message(s) to target(s)
+    // Send message(s) to target(s).
     send-request: func(
         target: address,
         request: request,
