@@ -33,10 +33,12 @@ interface standard {
     }
 
     record request {
-        // if true, this request inherits context AND lazy_load_blob of
-        // incipient request, and cannot have its own context.
+        // set in order to inherit lazy_load_blob from parent message, and if
+        // expects-response is none, direct response to source of parent.
+        // also carries forward certain aspects of parent message in kernel,
+        // see documentation for formal spec and examples.
         inherit: bool,
-        // if Some, request expects a response in the given number of seconds
+        // if some, request expects a response in the given number of seconds
         expects-response: option<u64>,
         body: list<u8>,
         metadata: option<json>,
