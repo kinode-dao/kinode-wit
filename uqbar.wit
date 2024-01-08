@@ -1,15 +1,19 @@
-package uqbar:process@0.6.0;
+package uqbar:process@0.7.0;
 
 interface standard {
+    //
+    // System types:
+    //
+
     // JSON is passed over WASM boundary as a string.
     type json = string;
 
     type node-id = string;
 
-    // context, like ipc, is a protocol-defined serialized byte array.
-    // it is used when building a Request to save information
-    // that will not be part of a Response, in order to more
-    // easily handle ("contextualize") that Response.
+    // Context, like a message body, is a protocol-defined serialized byte
+    // array. It is used when building a Request to save information that
+    // will not be part of a Response, in order to more easily handle
+    // ("contextualize") that Response.
     type context = list<u8>;
 
     record process-id {
@@ -23,36 +27,35 @@ interface standard {
         process: process-id,
     }
 
-    record payload {
+    record lazy_load_blob {
         mime: option<string>,
         bytes: list<u8>,
     }
 
     record request {
-        // if true, this request inherits context AND payload of incipient
-        // request, and cannot have its own context.
+        // if true, this request inherits context AND lazy_load_blob of
+        // incipient request, and cannot have its own context.
         inherit: bool,
-        // if Some, this request expects a response in the number of seconds given
+        // if Some, request expects a response in the given number of seconds
         expects-response: option<u64>,
-        ipc: list<u8>,
+        body: list<u8>,
         metadata: option<json>,
         capabilities: list<capability>,
-        // to grab payload, use get_payload()
+        // to grab lazy_load_blob, use get_blob()
     }
 
     record response {
         inherit: bool,
-        ipc: list<u8>,
+        body: list<u8>,
         metadata: option<json>,
         capabilities: list<capability>,
-        // to grab payload, use get_payload()
+        // to grab lazy_load_blob, use get_blob()
     }
 
-    // a message can be a request or a response.
-    // within a response, there is a result which surfaces any error
-    // that happened because of a request.
-    // a successful response will contain the context of the request
-    // it matches, if any was set.
+    // A message can be a request or a response. within a response, there is
+    // a result which surfaces any error that happened because of a request.
+    // A successful response will contain the context of the request it
+    // matches, if any was set.
     variant message {
         request(request),
         response(tuple<response, option<context>>),
@@ -63,25 +66,27 @@ interface standard {
         params: json,
     }
 
-    // on-exit is a setting that determines what happens when a process panics, completes, or otherwise "ends"
-    // NOTE: requests should have expects-response set to false, will always be set to that by kernel
+    // On-exit is a setting that determines what happens when a process
+    // panics, completes, or otherwise "ends". NOTE: requests should have
+    // expects-response set to false, will always be set to that by kernel.
     variant on-exit {
         none,
         restart,
-        requests(list<tuple<address, request, option<payload>>>),
+        requests(list<tuple<address, request, option<lazy_load_blob>>>),
     }
 
-    // network errors come from trying to send a message to another node.
-    // a message can fail by timing out, or by the node being entirely unreachable (offline).
-    // in either case, the message is not delivered, and the process that sent it
-    // receives that message along with any assigned context and/or payload,
-    // and is free to handle it as it sees fit.
-    // note that if the message is a response, the process can issue a response again,
-    // and it will be directed to the same (remote) request as the original.
+    // Network errors come from trying to send a message to another node.
+    // A message can fail by timing out, or by the node being entirely
+    // unreachable (offline). In either case, the message is not delivered
+    // and the process that sent it receives that message along with any
+    // assigned context and/or lazy_load_blob, and is free to handle it as it
+    // sees fit. Note that if the message is a response, the process can
+    // issue a response again, and it will be directed to the same (remote)
+    // request as the original.
     record send-error {
         kind: send-error-kind,
         message: message,
-        payload: option<payload>,
+        lazy_load_blob: option<lazy_load_blob>,
     }
 
     enum send-error-kind {
@@ -95,13 +100,15 @@ interface standard {
         // TODO more here?
     }
 
-    // system utils:
+    //
+    // System utils:
+    //
+
     print-to-terminal: func(verbosity: u8, message: string);
 
-    // **more will be added here with regard to blockchains**
-    get-eth-block: func() -> u64;
-
-    // process management:
+    //
+    // Process management:
+    //
 
     set-on-exit: func(on-exit: on-exit);
 
@@ -114,47 +121,65 @@ interface standard {
     clear-state: func();
 
     spawn: func(
-                name: option<string>,
-                wasm-path: string, // must be located within package's drive
-                on-exit: on-exit,
-                request-capabilities: list<capability>,
-                // note that we are restricting granting to just messaging the newly spawned process
-                grant-capabilities: list<process-id>,
-                public: bool
-            ) -> result<process-id, spawn-error>;
+        name: option<string>,
+        wasm-path: string, // must be located within package's drive
+        on-exit: on-exit,
+        request-capabilities: list<capability>,
+        // note that we are restricting granting to just messaging the
+        // newly spawned process
+        grant-capabilities: list<process-id>,
+        public: bool
+    ) -> result<process-id, spawn-error>;
 
-    // capabilities management
+    //
+    // capabilities management:
+    //
 
-    // saves the capabilities to persisted process state
+    // Saves the capabilities to persisted process state.
     save-capabilities: func(caps: list<capability>);
 
-    // gets all capabilities from persisted process state
+    // Gets all capabilities from persisted process state.
     our-capabilities: func() -> list<capability>;
 
+    //
     // message I/O:
+    //
 
-    // ingest next message when it arrives along with its source.
-    // almost all long-running processes will call this in a loop
-    receive: func() -> result<tuple<address, message>, tuple<send-error, option<context>>>;
+    // Ingest next message when it arrives along with its source.
+    // Almost all long-running processes will call this in a loop.
+    receive: func() ->
+        result<tuple<address, message>, tuple<send-error, option<context>>>;
 
-    // gets payload, if any, of the message we just received
-    get-payload: func() -> option<payload>;
+    // Gets lazy_load_blob, if any, of the message we most recently received.
+    get-blob: func() -> option<lazy_load_blob>;
 
     // send message(s) to target(s)
-    send-request:
-        func(target: address, request: request, context: option<context>, payload: option<payload>);
+    send-request: func(
+        target: address,
+        request: request,
+        context: option<context>,
+        lazy_load_blob: option<lazy_load_blob>
+    );
 
-    send-requests:
-        func(requests: list<tuple<address, request, option<context>, option<payload>>>);
+    send-requests: func(
+        requests: list<tuple<address,
+                             request,
+                             option<context>,
+                             option<lazy_load_blob>>>
+    );
 
-    send-response:
-        func(response: response, payload: option<payload>);
+    send-response: func(
+        response: response,
+        lazy_load_blob: option<lazy_load_blob>
+    );
 
-    // send a single request, then block (internally) until its response
-    // the type is Message but will always contain Response
-    send-and-await-response:
-        func(target: address, request: request, payload: option<payload>) ->
-            result<tuple<address, message>, send-error>;
+    // Send a single request, then block (internally) until its response. The
+    // type returned is Message but will always contain Response.
+    send-and-await-response: func(
+        target: address,
+        request: request,
+        lazy_load_blob: option<lazy_load_blob>
+    ) -> result<tuple<address, message>, send-error>;
 }
 
 world lib {
