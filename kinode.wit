@@ -1,4 +1,4 @@
-package kinode:process@0.7.0;
+package kinode:process@0.7.1;
 
 interface standard {
     //
@@ -102,6 +102,11 @@ interface standard {
         // TODO more here?
     }
 
+    enum message-type {
+        request,
+        response,
+    }
+
     //
     // System utils:
     //
@@ -154,6 +159,11 @@ interface standard {
 
     // Gets lazy-load-blob, if any, of the message we most recently received.
     get-blob: func() -> option<lazy-load-blob>;
+
+    // Modifies lazy-load-blob, if any, to a KinodeExtWSMessage.
+    mutate-blob-for-ext-ws: func(
+        message-type: message-type,
+    );
 
     // Send message(s) to target(s).
     send-request: func(
