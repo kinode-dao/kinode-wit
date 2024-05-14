@@ -189,7 +189,7 @@ world lib {
     import standard;
 }
 
-world process-v0.8.0 {
+world process-v0 {
     include lib;
 
     export init: func(our: string);
