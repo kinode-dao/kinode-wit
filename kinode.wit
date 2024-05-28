@@ -22,6 +22,11 @@ interface standard {
         publisher-node: node-id,
     }
 
+    record package-id {
+        package-name: string,
+        publisher-node: node-id,
+    }
+
     record address {
         node: node-id,
         process: process-id,
