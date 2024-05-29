@@ -83,9 +83,9 @@ interface standard {
     // unreachable (offline). In either case, the message is not delivered
     // and the process that sent it receives that message along with any
     // assigned context and/or lazy-load-blob, and is free to handle it as it
-    // sees fit. Note that if the message is a response, the process can
+    // sees fit. Note that if the failed message is a response, the process can
     // issue a response again, and it will be directed to the same (remote)
-    // request as the original.
+    // request as the original response.
     record send-error {
         kind: send-error-kind,
         message: message,
