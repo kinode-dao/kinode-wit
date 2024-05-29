@@ -36,7 +36,8 @@ interface standard {
         // set in order to inherit lazy-load-blob from parent message, and if
         // expects-response is none, direct response to source of parent.
         // also carries forward certain aspects of parent message in kernel,
-        // see documentation for formal spec and examples.
+        // see documentation for formal spec and examples:
+        // https://docs.rs/kinode_process_lib/latest/kinode_process_lib/struct.Request.html
         inherit: bool,
         // if some, request expects a response in the given number of seconds
         expects-response: option<u64>,
