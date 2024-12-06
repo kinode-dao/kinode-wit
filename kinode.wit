@@ -1,4 +1,4 @@
-package kinode:process@0.7.0;
+package kinode:process@0.8.0;
 
 interface standard {
     //
@@ -18,6 +18,11 @@ interface standard {
 
     record process-id {
         process-name: string,
+        package-name: string,
+        publisher-node: node-id,
+    }
+
+    record package-id {
         package-name: string,
         publisher-node: node-id,
     }
@@ -82,11 +87,10 @@ interface standard {
     // unreachable (offline). In either case, the message is not delivered
     // and the process that sent it receives that message along with any
     // assigned context and/or lazy-load-blob, and is free to handle it as it
-    // sees fit. Note that if the message is a response, the process can
-    // issue a response again, and it will be directed to the same (remote)
-    // request as the original.
+    // sees fit.
     record send-error {
         kind: send-error-kind,
+        target: address,
         message: message,
         lazy-load-blob: option<lazy-load-blob>,
     }
@@ -99,7 +103,6 @@ interface standard {
     enum spawn-error {
         name-taken,
         no-file-at-path,
-        // TODO more here?
     }
 
     //
@@ -191,7 +194,7 @@ world lib {
     import standard;
 }
 
-world process {
+world process-v0 {
     include lib;
 
     export init: func(our: string);
