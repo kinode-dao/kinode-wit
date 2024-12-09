@@ -62,7 +62,7 @@ interface standard {
         // to grab lazy-load-blob, use get_blob()
     }
 
-    /// A message can be a request or a response. within a response, there is
+    /// A message can be a request or a response. Within a response, there is
     /// a result which surfaces any error that happened because of a request.
     /// A successful response will contain the context of the request it
     /// matches, if any was set.
