@@ -176,11 +176,11 @@ interface standard {
     /// Returns whether or not the current message has a blob.
     has-blob: func() -> bool;
 
-    /// Returns the blob of the current message, if any
-    get-last-blob: func() -> option<lazy-load-blob>;
+    /// Returns the blob of the current message, if any.
+    get-blob: func() -> option<lazy-load-blob>;
 
     /// Returns the last blob this process received.
-    get-blob: func() -> option<lazy-load-blob>;
+    last-blob: func() -> option<lazy-load-blob>;
 
     /// Send request to target.
     send-request: func(
